@@ -1,10 +1,20 @@
+import _config_VidhosticeSDK_
 import sys
 import untangle
+from pathlib import Path
 #pip install untangle
 
 
-FS22_data = 'c:/FS22/Data_FS22/data'
+FS22_data = _config_VidhosticeSDK_.FS22_data
+#FS22_data = 'c:/FS22/Data_FS22/data'
 
+
+if len(sys.argv) < 2:
+    print('Error: Missing argument I3D file')
+    sys.exit()
+if not Path(sys.argv[1]).exists():
+    print('Error: File not found:', sys.argv[1])
+    sys.exit()
 
 obj = untangle.parse(sys.argv[1])
 
@@ -54,15 +64,24 @@ for shape in obj.i3D.Scene.Shape:
 
         texture = Filename_from_fileId(fileId_Texture_from_materialId(material))
         if texture is not None:
-            print('map_Kd '+texture.replace('$data', FS22_data))
+            file_texture = Path(texture.replace('$data', FS22_data))
+            if file_texture.with_suffix('.png').exists():
+                file_texture = file_texture.with_suffix('.png')
+            print('map_Kd ' + str(file_texture.as_posix()))
 
         normalmap = Filename_from_fileId(fileId_Normalmap_from_materialId(material))
         if normalmap is not None:
-            print('map_Bump '+normalmap.replace('$data', FS22_data))
+            file_normalmap = Path(normalmap.replace('$data', FS22_data))
+            if file_normalmap.with_suffix('.png').exists():
+                file_normalmap = file_normalmap.with_suffix('.png')
+            print('map_Bump ' + str(file_normalmap.as_posix()))
 
         glossmap = Filename_from_fileId(fileId_Glossmap_from_materialId(material))
         if glossmap is not None:
-            print('map_Ks '+glossmap.replace('$data', FS22_data))
+            file_glossmap = Path(glossmap.replace('$data', FS22_data))
+            if file_glossmap.with_suffix('.png').exists():
+                file_glossmap = file_glossmap.with_suffix('.png')
+            print('map_Ks ' + str(file_glossmap.as_posix()))
 
         i = i + 1
 
