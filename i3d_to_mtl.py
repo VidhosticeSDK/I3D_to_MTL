@@ -53,7 +53,7 @@ def Filename_from_fileId(fileId):
 for shape in obj.i3D.Scene.Shape:
     print('I3D to MTL by VidhosticeSDK')
     print('Input file: ', sys.argv[1])
-    print('Output file:', shape['name']+'_'+shape['nodeId']+'.mtl')
+    print('Output file:', shape['nodeId']+'_'+shape['name']+'.mtl')
     print('  list of materials:', shape['materialIds'])
     file = open(shape['name']+'_'+shape['nodeId']+'.mtl', "w")
     sys.stdout = file
