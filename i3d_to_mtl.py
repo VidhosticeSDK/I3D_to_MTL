@@ -9,15 +9,6 @@ FS22_data = _config_VidhosticeSDK_.FS22_data
 #FS22_data = 'c:/FS22/Data_FS22/data'
 
 
-if len(sys.argv) < 2:
-    print('Error: Missing argument I3D file')
-    sys.exit()
-if not Path(sys.argv[1]).exists():
-    print('Error: File not found:', sys.argv[1])
-    sys.exit()
-
-obj = untangle.parse(sys.argv[1])
-
 def fileId_Texture_from_materialId(materialId):
     for material in obj.i3D.Materials.Material:
         if 'Texture' in dir(material):
@@ -49,13 +40,11 @@ def Filename_from_fileId(fileId):
         if file['fileId'] == fileId:
             return file['filename']
 
-
-for shape in obj.i3D.Scene.Shape:
-    print('I3D to MTL by VidhosticeSDK')
-    print('Input file: ', sys.argv[1])
-    print('Output file:', shape['shapeId']+'_'+shape['name']+'.mtl')
-    print('  list of materials:', shape['materialIds'])
-    file = open(shape['shapeId']+'_'+shape['name']+'.mtl', "w")
+def export_mtl(shape, prefix=''):
+    str_shapeId = F"{int(shape['shapeId']):03}"
+    print(prefix+'List of materialIds:', shape['materialIds'])
+    print(prefix+'Output file:', str_shapeId+'_'+shape['name']+'.mtl')
+    file = open(str_shapeId+'_'+shape['name']+'.mtl', "w")
     sys.stdout = file
     materials = shape['materialIds']
     i = 1
@@ -87,4 +76,37 @@ for shape in obj.i3D.Scene.Shape:
 
     sys.stdout = sys.__stdout__
     file.close()
-    print('Done')
+
+def parse_scene(children, t=0):
+    for ele in children:
+        if ele._name == 'Shape':
+            text = '( shapeId: ' + ele['shapeId'] + ' name: ' + ele['name'] + ' )'
+            print(" "*t*2 + "\\", ele._name, text)
+            export_mtl(ele, " "*t*2 + "   ")
+        elif ele._name == 'TransformGroup':
+            text = '( name: ' + ele['name'] + ' )'
+            print(" "*t*2 + "\\", ele._name, text)
+        else:
+            text = ''
+            print(" "*t*2 + "\\", ele._name, text)
+        if len(ele.children):
+            parse_scene(ele.children, t+1)
+
+#-------------------------------------------------------------------------------
+print('I3D to MTL by VidhosticeSDK')
+
+if len(sys.argv) < 2:
+    print('Error: Missing argument I3D file')
+    sys.exit()
+if not Path(sys.argv[1]).exists():
+    print('Error: File not found:', sys.argv[1])
+    sys.exit()
+
+print('Input file: ', sys.argv[1])
+print()
+
+obj = untangle.parse(sys.argv[1])
+
+parse_scene(obj.i3D.Scene.children)
+
+print('Done')
