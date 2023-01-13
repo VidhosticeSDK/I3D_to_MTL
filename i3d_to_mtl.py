@@ -43,8 +43,8 @@ def Filename_from_fileId(fileId):
 def export_mtl(shape, prefix=''):
     str_shapeId = F"{int(shape['shapeId']):03}"
     print(prefix+'List of materialIds:', shape['materialIds'])
-    print(prefix+'Output file:', str_shapeId+'_'+shape['name']+'.mtl')
-    file = open(str_shapeId+'_'+shape['name']+'.mtl', "w")
+    print(prefix+'Output file:', str_shapeId+'_'+shape['name']+'_'+shape['nodeId']+'.mtl')
+    file = open(str_shapeId+'_'+shape['name']+'_'+shape['nodeId']+'.mtl', "w")
     sys.stdout = file
     materials = shape['materialIds']
     i = 1
